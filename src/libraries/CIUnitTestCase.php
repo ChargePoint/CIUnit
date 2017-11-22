@@ -160,6 +160,31 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $varName
+     * @param string $className
+     * @param array $methods
+     * @param bool $disableOriginalConstructor
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mock($varName, $className, $methods = array(), $disableOriginalConstructor = true)
+    {
+        $mockObjectBuilder = $this
+            ->getMockBuilder($className)
+            ->setMethods($methods);
+
+        if ($disableOriginalConstructor) {
+            $mockObjectBuilder->disableOriginalConstructor();
+        }
+
+        $mockObject = $mockObjectBuilder->getMock();
+
+        $this->CI->$varName = $mockObject;
+
+        return $mockObject;
+    }
+
+    /**
      * loads a database fixture
      * for each given fixture, we look up the yaml file and insert that into the corresponding table
      * names are by convention
