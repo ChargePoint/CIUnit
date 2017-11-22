@@ -185,6 +185,18 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Method to access actual loader even when loader is mocked
+     *
+     * @return mixed
+     */
+    protected function load()
+    {
+        return array_key_exists('load', $this->preLoadedVars)
+            ? $this->preLoadedVars['load']
+            : $this->CI->load;
+    }
+
+    /**
      * loads a database fixture
      * for each given fixture, we look up the yaml file and insert that into the corresponding table
      * names are by convention
