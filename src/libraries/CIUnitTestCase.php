@@ -64,6 +64,15 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     // ------------------------------------------------------------------------
 
     /**
+     * Array to maintain list of pre-loaded variables
+     *
+     * @var array
+     */
+    protected $preLoadedVars = array();
+
+    // ------------------------------------------------------------------------
+
+    /**
      * Constructor
      *
      * @param    string $name
@@ -74,6 +83,10 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     {
         parent::__construct($name, $data, $dataName);
         $this->CI =& get_instance();
+
+        foreach (get_object_vars($this->CI) as $var => $value) {
+            $this->preLoadedVars[$var] = $value;
+        }
 
         log_message('debug', get_class($this) . ' CIUnit_TestCase initialized');
     }
@@ -93,6 +106,10 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
         if (!empty($this->tables)) {
             $this->dbfixt($this->tables);
         }
+
+        $this->CI->load->reset();
+
+        $this->setController('CIU_Controller');
     }
 
     /**
@@ -106,10 +123,40 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        $this->restorePreLoadedVars();
+
         // Only run if the $tables attribute is set.
         if (!empty($this->tables)) {
             $this->dbfixt_unload($this->tables);
         }
+    }
+
+    /**
+     * Restores pre-loaded variables in CI
+     *
+     * @return void
+     */
+    protected function restorePreLoadedVars()
+    {
+        $CI = &CIUnit::get_controller();
+        foreach ($this->preLoadedVars as $var => $value) {
+            $CI->$var = $value;
+        }
+    }
+
+    /**
+     * @param string $controller
+     * @param bool   $path
+     *
+     * @return mixed
+     */
+    protected function &setController($controller = 'CIU_Controller', $path = false)
+    {
+        set_controller($controller, $path);
+
+        $this->CI = &CIUnit::get_controller();
+
+        return CIUnit::get_controller();
     }
 
     /**
