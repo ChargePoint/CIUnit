@@ -13,6 +13,7 @@
  */
 class Fixture
 {
+    private $CI;
 
     function __construct()
     {
@@ -66,10 +67,11 @@ class Fixture
 
     private function _assign_db()
     {
+        $this->CI = & get_instance();
+
         if (!isset($this->CI->db) OR
             !isset($this->CI->db->database)
         ) {
-            $this->CI =& get_instance();
             $this->CI->load->database();
         }
 
