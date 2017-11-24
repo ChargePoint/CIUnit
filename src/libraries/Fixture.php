@@ -26,9 +26,13 @@ class Fixture
     /**
      * loads fixture data $fixt into corresponding table
      */
-    function load($table, $fixt)
+    function load($table, $fixt, $unload = false)
     {
-        $this->unload($table);
+        $this->_assign_db();
+
+        if ($unload) {
+            $this->unload($table);
+        }
 
         // $fixt is supposed to be an associative array
         // E.g. outputted by spyc from reading a YAML file
