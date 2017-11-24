@@ -28,11 +28,10 @@ class Fixture
      */
     function load($table, $fixt)
     {
-        $this->_assign_db();
+        $this->unload($table);
 
         // $fixt is supposed to be an associative array
         // E.g. outputted by spyc from reading a YAML file
-        $this->CI->db->simple_query('truncate table ' . $table . ';');
 
         foreach ($fixt as $id => $row) {
             foreach ($row as $key => $val) {
@@ -55,7 +54,7 @@ class Fixture
     {
         $this->_assign_db();
 
-        $Q = $this->CI->db->simple_query('truncate table ' . $table . ';');
+        $Q = $this->CI->db->simple_query('delete from ' . $table . ';');
 
         if (!$Q) {
             echo $this->CI->db->call_function('error', $this->CI->db->conn_id);
