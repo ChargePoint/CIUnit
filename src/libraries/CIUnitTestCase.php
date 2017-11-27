@@ -84,10 +84,6 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
         parent::__construct($name, $data, $dataName);
         $this->CI =& get_instance();
 
-        foreach (get_object_vars($this->CI) as $var => $value) {
-            $this->preLoadedVars[$var] = $value;
-        }
-
         log_message('debug', get_class($this) . ' CIUnit_TestCase initialized');
     }
 
@@ -106,10 +102,14 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
         if (!empty($this->tables)) {
             $this->dbfixt($this->tables);
         }
-
         $this->CI->load->reset();
 
         $this->setController('CIU_Controller');
+
+        foreach (is_loaded() as $var => $class) {
+            $this->preLoadedVars[$var] = $this->CI->$var;
+        }
+
     }
 
     /**
@@ -138,9 +138,10 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function restorePreLoadedVars()
     {
-        $CI = &CIUnit::get_controller();
-        foreach ($this->preLoadedVars as $var => $value) {
-            $CI->$var = $value;
+        foreach (is_loaded() as $var => $class) {
+            $this->CI->$var = isset($this->preLoadedVars[$var])
+                ? $this->preLoadedVars[$var]
+                : null;
         }
     }
 
@@ -206,8 +207,8 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function load()
     {
-        return array_key_exists('load', $this->preLoadedVars)
-            ? $this->preLoadedVars['load']
+        return array_key_exists('loader', $this->preLoadedVars)
+            ? $this->preLoadedVars['loader']
             : $this->CI->load;
     }
 
