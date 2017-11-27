@@ -152,7 +152,22 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function &setController($controller = 'CIU_Controller', $path = false)
     {
-        set_controller($controller, $path);
+        $CI = set_controller($controller, $path);
+
+        $this->CI = &$CI;
+
+        if (class_exists('CI')) {
+            CI::$APP = &$CI;
+        }
+
+        return CIUnit::get_controller();
+    }
+
+    protected function &setModule($module)
+    {
+        if (class_exists('Modules')) {
+            CIUnit::$controller = Modules::load($module);
+        }
 
         $this->CI = &CIUnit::get_controller();
 
