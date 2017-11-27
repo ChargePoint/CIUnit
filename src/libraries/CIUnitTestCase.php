@@ -139,9 +139,11 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     protected function restorePreLoadedVars()
     {
         foreach (is_loaded() as $var => $class) {
-            $this->CI->$var = isset($this->preLoadedVars[$var])
-                ? $this->preLoadedVars[$var]
-                : null;
+            if(isset($this->preLoadedVars[$var])) {
+                $this->CI->$var = $this->preLoadedVars[$var];
+            } else {
+                is_loaded($var, false);
+            }
         }
     }
 
@@ -193,11 +195,12 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
             $mockObjectBuilder->disableOriginalConstructor();
         }
 
-        $mockObject = $mockObjectBuilder->getMock();
+        $this->CI->$varName = load_class([
+            'class' => $className,
+            'object' => $mockObjectBuilder->getMock()
+        ]);
 
-        $this->CI->$varName = $mockObject;
-
-        return $mockObject;
+        return $this->CI->$varName;
     }
 
     /**
