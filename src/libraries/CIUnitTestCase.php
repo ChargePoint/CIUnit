@@ -169,6 +169,7 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     protected function &setModule($module)
     {
         if (class_exists('Modules')) {
+            Modules::$registry = array();
             CIUnit::$controller = Modules::load($module);
         }
 
