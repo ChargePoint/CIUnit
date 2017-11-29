@@ -9,7 +9,10 @@ class CIUnit_DBTestCase extends CIUnit_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->CI->db = get_instance()->load->database('', true);
+        $this->CI->db = load_class([
+            'class' => 'db',
+            'object' => get_instance()->load->database('', true)
+        ]);
         $this->CI->db->trans_start();
     }
 
