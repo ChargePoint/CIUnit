@@ -30,7 +30,7 @@ trait CIUnit_Assert
  * Extending the default phpUnit Framework_TestCase Class
  * providing eg. fixtures, custom assertions, utilities etc.
  */
-class CIUnit_TestCase extends PHPUnit_Framework_TestCase
+abstract class CIUnit_TestCase extends PHPUnit_Framework_TestCase
 {
     use CIUnit_Assert;
 

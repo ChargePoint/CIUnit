@@ -4,7 +4,7 @@
  * Class ModelTestCase
  * Base class for Model test cases
  */
-class CIUnit_DBTestCase extends CIUnit_TestCase
+abstract class CIUnit_DBTestCase extends CIUnit_TestCase
 {
     protected function setUp()
     {
