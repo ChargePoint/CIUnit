@@ -173,18 +173,6 @@ abstract class CIUnit_TestCase extends PHPUnit_Framework_TestCase
         return CIUnit::get_controller();
     }
 
-    protected function &setModule($module)
-    {
-        if (class_exists('Modules')) {
-            Modules::$registry = array();
-            CIUnit::$controller = Modules::load($module);
-        }
-
-        $this->CI = &CIUnit::get_controller();
-
-        return CIUnit::get_controller();
-    }
-
     /**
      * @param string $varName
      * @param string $className
