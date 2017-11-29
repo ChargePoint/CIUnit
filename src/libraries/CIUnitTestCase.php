@@ -17,6 +17,13 @@ trait CIUnit_Assert
 
         self::assertThat($haystack, $constraint, $message);
     }
+
+    public static function captureArg( &$arg ) {
+        return self::callback( function( $argToMock ) use ( &$arg ) {
+            $arg = $argToMock;
+            return true;
+        } );
+    }
 }
 
 /**
