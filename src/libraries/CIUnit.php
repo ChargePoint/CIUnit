@@ -60,54 +60,6 @@ class CIUnit
     public static function &set_controller($controller = 'CI_Controller', $path = FALSE)
     {
         $controller_name = array_pop(explode('/', $controller));
-        //echo "\nc name ".$controller_name;
-        //is it the current controller?
-        if ($controller_name == self::$current) {
-            //we have nothing to do, return current controller
-            //echo "current found!"; die();
-            output();
-            viewvars();
-            return self::$controller;
-        }
-
-        // the current controller must be archieved before littered
-        $loader =& load_class('Loader', 'core');
-
-        // reset all loaded data
-        $loader->reset();
-
-        //echo 'Var Dump of self::$controllers -- ';
-        //var_dump(self::$controllers);
-
-        /*
-        =========================================================
-        I don't understand this section of code.
-        self::$controllers[self::$current] is never set when testing
-        models. Maybe it will be set when testing controllers?
-        =========================================================
-        if (isset(self::$controllers[self::$current]))
-        {
-            self::$controllers[self::$current]['models'] = $loader->_ci_models;
-            //this might be an update if it was there before
-            // FIXME, all additional properties of the loader / controllers
-            // that have to be reset must go in some test config file..
-            //'components' => $loader->_ci_components,
-            //'classes' => $loader->_ci_classes
-        }
-
-        ===================================================
-        I don't understand why this code is clearing out
-        all the loaded components such as autoloaded models
-        -- this is very frustrating
-        ==================================================
-        //clean up the current controllers mess
-        //reset models
-        $loader->_ci_models = array();
-        //reset components
-        //$loader->_ci_components = array();
-        //reset saved queries
-        self::$controller->db->queries = array();
-        */
 
         //clean output / viewvars as well;
         if (isset(self::$controller->output)) {
@@ -115,34 +67,20 @@ class CIUnit
             viewvars();
         }
 
-        //the requested controller was loaded before?
-        if (isset(self::$controllers[$controller_name])) {
-            //echo "saved found! $controller_name";
-            //load it
-            $old =& self::$controllers[$controller_name];
-            self::$controller =& $old['address'];
-            self::$current = $controller_name;
-            //$loader->_ci_models = $old['models'];
-            //$loader->_ci_components = $old['components'];
-            //$loader->_ci_classes = &$old['classes'];
-        } else {
-            //echo "load new $controller_name";
-            //it was not loaded before
-            if (!class_exists($controller_name)) {
-                if ($path && file_exists($path . $controller . EXT)) {
-                    include_once($path . $controller . EXT);
-                } else {
-                    include_once(APPPATH . 'controllers/' . $controller . EXT);
-                }
+        if (!class_exists($controller_name)) {
+            if ($path && file_exists($path . $controller . EXT)) {
+                include_once($path . $controller . EXT);
+            } else {
+                include_once(APPPATH . 'controllers/' . $controller . EXT);
             }
-
-            self::$current = $controller_name;
-            self::$controllers[$controller_name] = array(
-                'address' => new $controller_name(),
-                'models' => array()
-            );
-            self::$controller =& self::$controllers[$controller_name]['address'];
         }
+
+        self::$current = $controller_name;
+        self::$controllers[$controller_name] = array(
+            'address' => new $controller_name(),
+            'models' => array(),
+        );
+        self::$controller = & self::$controllers[$controller_name]['address'];
 
 //		var_dump(self::$controllers); die();
 

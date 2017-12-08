@@ -24,7 +24,7 @@
  * @author      ExpressionEngine Dev Team
  * @link        http://codeigniter.com/user_guide/libraries/exceptions.html
  */
-class CIU_Exceptions extends CI_Exceptions
+class CIU_Exceptions extends MY_Exceptions
 {
 
     /**

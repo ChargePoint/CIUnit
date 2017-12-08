@@ -53,6 +53,13 @@ if (!function_exists('load_class')) {
     {
         static $_classes = array();
 
+        if (is_array($class)) {
+            $_classes[$class['class']] = $class['object'];
+            is_loaded($class['class']);
+
+            $class = $class['class'];
+        }
+
         // Does the class exist? If so, we're done...
         if (isset($_classes[$class])) {
             return $_classes[$class];
@@ -162,5 +169,31 @@ if (!function_exists('get_config')) {
         }
         $_config[0] =& $config;
         return $_config[0];
+    }
+}
+
+/**
+ * Keeps track of which libraries have been loaded.  This function is
+ * called by the load_class() function above
+ *
+ * @access	public
+ * @return	array
+ */
+if ( ! function_exists('is_loaded'))
+{
+    function is_loaded($class = '', $persist = true)
+    {
+        static $_is_loaded = array();
+
+        if ($class != '')
+        {
+            if ($persist) {
+                $_is_loaded[strtolower($class)] = $class;
+            } else {
+                unset($_is_loaded[strtolower($class)]);
+            }
+        }
+
+        return $_is_loaded;
     }
 }

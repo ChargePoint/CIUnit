@@ -17,13 +17,20 @@ trait CIUnit_Assert
 
         self::assertThat($haystack, $constraint, $message);
     }
+
+    public static function captureArg( &$arg ) {
+        return self::callback( function( $argToMock ) use ( &$arg ) {
+            $arg = $argToMock;
+            return true;
+        } );
+    }
 }
 
 /**
  * Extending the default phpUnit Framework_TestCase Class
  * providing eg. fixtures, custom assertions, utilities etc.
  */
-class CIUnit_TestCase extends PHPUnit_Framework_TestCase
+abstract class CIUnit_TestCase extends PHPUnit_Framework_TestCase
 {
     use CIUnit_Assert;
 
@@ -64,6 +71,15 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
     // ------------------------------------------------------------------------
 
     /**
+     * Array to maintain list of pre-loaded variables
+     *
+     * @var array
+     */
+    protected $preLoadedVars = array();
+
+    // ------------------------------------------------------------------------
+
+    /**
      * Constructor
      *
      * @param    string $name
@@ -93,6 +109,14 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
         if (!empty($this->tables)) {
             $this->dbfixt($this->tables);
         }
+        $this->CI->load->reset();
+
+        $this->setController('CIU_Controller');
+
+        foreach (is_loaded() as $var => $class) {
+            $this->preLoadedVars[$var] = $this->CI->$var;
+        }
+
     }
 
     /**
@@ -106,10 +130,85 @@ class CIUnit_TestCase extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        $this->restorePreLoadedVars();
+
         // Only run if the $tables attribute is set.
         if (!empty($this->tables)) {
             $this->dbfixt_unload($this->tables);
         }
+    }
+
+    /**
+     * Restores pre-loaded variables in CI
+     *
+     * @return void
+     */
+    protected function restorePreLoadedVars()
+    {
+        foreach (is_loaded() as $var => $class) {
+            if(isset($this->preLoadedVars[$var])) {
+                $this->CI->$var = $this->preLoadedVars[$var];
+            } else {
+                is_loaded($var, false);
+            }
+        }
+    }
+
+    /**
+     * @param string $controller
+     * @param bool   $path
+     *
+     * @return mixed
+     */
+    protected function &setController($controller = 'CIU_Controller', $path = false)
+    {
+        $CI = set_controller($controller, $path);
+
+        $this->CI = &$CI;
+
+        if (class_exists('CI')) {
+            CI::$APP = &$CI;
+        }
+
+        return CIUnit::get_controller();
+    }
+
+    /**
+     * @param string $varName
+     * @param string $className
+     * @param array $methods
+     * @param bool $disableOriginalConstructor
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function mock($varName, $className, $methods = array(), $disableOriginalConstructor = true)
+    {
+        $mockObjectBuilder = $this
+            ->getMockBuilder($className)
+            ->setMethods($methods);
+
+        if ($disableOriginalConstructor) {
+            $mockObjectBuilder->disableOriginalConstructor();
+        }
+
+        $this->CI->$varName = load_class([
+            'class' => $className,
+            'object' => $mockObjectBuilder->getMock()
+        ]);
+
+        return $this->CI->$varName;
+    }
+
+    /**
+     * Method to access actual loader even when loader is mocked
+     *
+     * @return mixed
+     */
+    protected function load()
+    {
+        return array_key_exists('loader', $this->preLoadedVars)
+            ? $this->preLoadedVars['loader']
+            : $this->CI->load;
     }
 
     /**

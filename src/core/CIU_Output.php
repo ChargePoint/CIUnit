@@ -13,7 +13,7 @@
 * If you use MY_Output, change the paraent class.
 */
 
-class CIU_Output extends CI_Output
+class CIU_Output extends MY_Output
 {
     public $views = array();
 
