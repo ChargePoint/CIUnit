@@ -276,7 +276,7 @@ class CIU_Loader extends MY_Loader
      * @param    bool
      * @return    void
      */
-    public function view($view, $vars = array(), $return = FALSE)
+    public function view($view, $vars = array(), $return = FALSE, $template = NULL, $newTemplate = false)
     {
         if ($return === TRUE) {
             return parent::view($view, $vars, $return);
