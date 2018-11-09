@@ -59,7 +59,8 @@ class CIUnit
 
     public static function &set_controller($controller = 'CI_Controller', $path = FALSE)
     {
-        $controller_name = array_pop(explode('/', $controller));
+        $segments = explode('/', $controller);
+        $controller_name = array_pop($segments);
 
         //clean output / viewvars as well;
         if (isset(self::$controller->output)) {
