@@ -25,7 +25,8 @@ define('CIUnit_Version', '0.18-dev_for_CI2.1.0');
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-define('ENVIRONMENT', 'testing');
+if (! defined('ENVIRONMENT')){ define('ENVIRONMENT', 'testing'); }
+
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
